@@ -18,19 +18,32 @@ export class AppService {
   }
 
   postSignIn(body: CreateUserDTO) {
-    const {avatar, username} = body
+    const { avatar, username } = body
     this.users.push(new User(username, avatar))
     return this.users
   }
 
-  postTweet(body: CreateTweetDTO){
-    const{tweet, username} = body
-    const existUser = this.users.find(e=> e.getUsername()===username)
-    if(existUser){
+  postTweet(body: CreateTweetDTO) {
+    const { tweet, username } = body
+    const existUser = this.users.find(e => e.getUsername() === username)
+    if (existUser) {
       this.tweets.push(new Tweet(existUser, tweet))
       return this.tweets
-    }else{
+    } else {
       throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED)
     }
+  }
+
+  getTweets(page: number) {
+    const myTweets = []
+    let index = this.tweets.length
+    if (page) {
+      index = index - (15 * (page-1))
+    }
+    --index
+    for (let i = index; (i > index - 15) && i >= 0; i--) {
+      myTweets.push(this.tweets[i].getTweet())
+    }
+    return myTweets
   }
 }
