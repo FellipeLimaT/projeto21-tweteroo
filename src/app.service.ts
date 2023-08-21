@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDTO } from './dtos/user.dto';
 import User from './entities/user';
 import Tweet from './entities/tweet';
+import { CreateTweetDTO } from './dtos/tweet.dto';
 
 @Injectable()
 export class AppService {
@@ -20,5 +21,16 @@ export class AppService {
     const {avatar, username} = body
     this.users.push(new User(username, avatar))
     return this.users
+  }
+
+  postTweet(body: CreateTweetDTO){
+    const{tweet, username} = body
+    const existUser = this.users.find(e=> e.getUsername()===username)
+    if(existUser){
+      this.tweets.push(new Tweet(existUser, tweet))
+      return this.tweets
+    }else{
+      throw new HttpException('UNAUTHORIZED', HttpStatus.UNAUTHORIZED)
+    }
   }
 }
